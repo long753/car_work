@@ -8,33 +8,33 @@
 
 #### 1.1初始化：
 
-1.初始化模型  smartcar.model_init();
-2.初始化通信  smartcar.uart_connect();
-3.初始化相机  smartcar.imagecapture.camera_init();
-4.启动相机    smartcar.imagecapture.run();
-5.启动AI推理  smartcar.ai_process_mul();
+1.初始化模型  smartcar.model_init();  
+2.初始化通信  smartcar.uart_connect();  
+3.初始化相机  smartcar.imagecapture.camera_init();  
+4.启动相机    smartcar.imagecapture.run();  
+5.启动AI推理  smartcar.ai_process_mul();  
 
 #### 1.2主要工作情况：
 
-这是原工程的主要的工作模式，在主可执行文件中，我们通过视觉的检测来判定当前场景，然后根据场景的不同，调用不同的场景类来进行相应的工作。具体的工作模式如下：
+这是原工程的主要的工作模式，在主可执行文件中，我们通过视觉的检测来判定当前场景，然后根据场景的不同，调用不同的场景类来进行相应的工作。具体的工作模式如下：  
 
-1.环岛--RingScene
-2.救援--RescueScene
-3.追车--RacingScene
-4.危险--DangerScene
-5.桥接--BridgeScene
-6.停车--ParkingScene
+1.环岛--RingScene  
+2.救援--RescueScene  
+3.追车--RacingScene  
+4.危险--DangerScene  
+5.桥接--BridgeScene  
+6.停车--ParkingScene  
 
 #### 1.3本届竞赛的主要工作：
 
-在学长的原代码的基础上，本届竞赛的主要工程主要有以下几个方面，可以发现有3种情况需要我们自行完成。同时，学长还要求我们自己写出环岛的代码，目前的主要工作是完成环岛部分的代码，包括环岛检测:detection/RingDetection.cpp   detection/RingDetection.h 环岛控制(我还没创)
+在学长的原代码的基础上，本届竞赛的主要工程主要有以下几个方面，可以发现有3种情况需要我们自行完成。同时，学长还要求我们自己写出环岛的代码，目前的主要工作是完成环岛部分的代码，包括环岛检测:detection/RingDetection.cpp   detection/RingDetection.h 环岛控制(我还没创)  
 
-1.环岛--RingScene       （相同or类似）
-2.餐饮--RestaurantScene
-3.充电--ChargingScene
-4.躲避--AvoidScene
-5.桥接--BridgeScene     （相同or类似）
-6.停车--ParkingScene    （相同or类似）
+1.环岛--RingScene       （相同or类似）  
+2.餐饮--RestaurantScene  
+3.充电--ChargingScene  
+4.躲避--AvoidScene  
+5.桥接--BridgeScene     （相同or类似）  
+6.停车--ParkingScene    （相同or类似）  
 
 ### 2. 核心类：SmartCar.h、SmartCar.cpp
 
