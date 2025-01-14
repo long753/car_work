@@ -1,0 +1,20 @@
+{
+    "bin_threshold": 200, 
+    "AUTO_WHITE_BALANCE": 1,
+    "EXPOSURE_AUTO": 1, 
+    "WHITE_BALANCE_TEMPERATURE": 4600,
+    "EXPOSURE_ABSOLUTE": 166,
+    "BRIGHTNESS": 0 ,
+    "CONTRAST": 8,
+    "SATURATION": 60,
+    "HUE": 0, 
+    "SHARPNESS": 2, 
+    "BACKLIGHT_COMPENSATION": 0, 
+    "GAMMA": 100, 
+    "record": [
+      {
+  
+  
+      }
+  ]
+  }

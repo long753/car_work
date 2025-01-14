@@ -1,0 +1,18 @@
+{
+    "@racing": "追逐区",
+    "racing_spy_exit_time":100,
+    "racing_cruise_frame":20,
+    "@bridge":"坡道",
+    "bridge_change_scheme": false,
+    "bridge_block_row":0.2,
+    "bridge_count_enter_changed":10,
+    "@danger":"危险区",
+    "danger_pingbi_row":0.25,
+    "danger_correct":false,
+    "danger_block_pingbi":0.2,
+    "danger_block_angle":50,
+    "danger_exit_frame":20,
+    "@rescue":"救援区",   
+    "rescue_exit_speed":1.5
+    
+}
