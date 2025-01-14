@@ -22,7 +22,7 @@
 2.救援--RescueScene  
 3.追车--RacingScene  
 4.危险--DangerScene  
-5.桥接--BridgeScene  
+5.桥--BridgeScene  
 6.停车--ParkingScene  
 
 #### 1.3本届竞赛的主要工作：
@@ -48,7 +48,21 @@
 
 ### 3. 控制文件夹：control
 
-### 4. 通信文件夹：detection
+### 4. 检测文件夹：detection
+
+该文件夹中包含了桥场景、危险场景、停车场景、救援场景、追车场景、环岛场景的检测代码。  
+
+#### 4.1桥检测
+
+#### 4.2危险检测
+
+#### 4.3停车检测
+
+#### 4.4救援检测
+
+#### 4.5追车检测    
+
+#### 4.6环岛检测
 
 ### 5. 驱动文件夹：driver
 
@@ -67,6 +81,69 @@
 均为配置文件或者说明文件等辅助性文件，无需过多关注，只需在必要时间修改即可。
 
 ## 类关系图
+
+### 主要类及其内容：
+
+#### 1. Uart 类
+用途：负责与小车硬件的串口通信，发送控制命令和接收传感器数据。  
+关键函数：  
+open()：打开串口连接。  
+startReceive()：启动接收线程，处理接收到的数据。  
+carControl(motorSpeed, servoPwm)：通过串口发送控制命令，调整小车的速度和方向。  
+
+#### 2. ImageCapture 类
+用途：负责图像捕捉和预处理。  
+关键成员：  
+rgb_image：存储捕捉到的彩色图像。  
+image_process：图像处理模块，执行图像二值化等操作。  
+image_update_flag：标志是否有新图像更新。  
+
+#### 3. Detection 类
+用途：负责 AI 物体检测，进行环境感知。  
+关键函数：  
+inference(cv::Mat m)：执行 AI 推理，处理图像并生成检测结果。  
+成员变量：  
+results：存储 AI 推理的结果。  
+
+#### 4. Findline 类
+用途：负责赛道线的识别和处理。　　
+关键函数：　　
+search_line(cv::Mat imageBinary)：在二值化图像中搜索赛道线。　　
+you_dan_diao_width() 和 zuo_dan_diao_width()：计算左右边界宽度，用于判断小车位置。　　
+midline_calculate()：计算中线位置，用于导航。　　
+成员变量：　　
+line_type：当前线条类型，如直线、曲线等。　　
+loseflag：标志是否失去赛道线。　　
+
+#### 5. 场景处理模块
+Ring、Cross、Bridge、Danger、Parking、Racing、Rescue 类：　　
+用途：分别处理不同的驾驶场景，执行特定的控制逻辑。　　
+关键函数：　　
+process(...)：处理特定场景下的逻辑，调整小车行为。　　
+成员变量：　　
+各自场景特定的参数和状态。　　
+
+####　6. Control 类
+用途：管理小车的运动控制参数，如速度和方向。　　
+成员变量：　　
+motorSpeed：电机速度。　　
+servoPwm：舵机 PWM 信号。　　
+turnP 和 turnD：PID 控制参数。　　
+qianzhan：前瞻控制参数。　　
+功能：　　
+error_cal(findline)：计算控制误差。　　
+servo_control(error, findline, scene)：调整舵机以校正方向。　　
+
+####　7. IcarShow 类
+用途：用于调试模式下的显示和可视化，实时展示小车状态和图像处理结果。　　
+关键函数：　　
+show_init()：初始化显示窗口。　　
+run()：运行显示逻辑。　　
+ai_draw_result(img, results)：绘制 AI 检测结果。　　
+get_Scene_string(scene)：获取当前场景的字符串表示。　　
+成员变量：　　
+debug_image1 和 debug_image2：用于显示的图像。　　
+debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。　　
 
 ## 基本规范
 
