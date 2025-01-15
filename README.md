@@ -161,7 +161,7 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 
 ```bash
  ssh root@192.168.1.101     
-```
+```  
 3.输入edgeboard的密码：edgeboard，即可连接成功。
 
 4.打开vscode，安装插件Remote-SSH，打开“远程资源管理器”，在vscode最上面输入：
@@ -218,4 +218,4 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
  cd /hoom/3group/build
  ./icar
 ```
-此时小车便成功启动，结束小车的运动只需在终端中输入指令`Ctrl+C`即可。
+此时小车便成功启动，结束小车的运动只需在终端中输入指令`Ctrl+C`即可。  
