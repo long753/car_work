@@ -39,6 +39,7 @@ cv::Point Findline::point_add(cv::Point & p1 , cv::Point &p2){
 
 */
 
+//Findline的主函数，用于计算各类所需数据的，具体的数据在.h文件中查看
 void Findline::search_line(Mat & imgb){
     bool left_stop = false;
     bool right_stop = false;
@@ -458,7 +459,9 @@ void Findline::search_line(Mat & imgb){
     this->edge_calculate();
 }
 
-// 判断赛道类型
+
+// 洗数据
+//得到pointsEdgeLeft，pointsEdgeRight，这是赛道的边线的点集，使用方法：pointsEdgeRight[i].col，pointsEdgeLeft[i].col，得到边线的列坐标，行是row
 void Findline::edge_calculate(){
    empty_row_left = 0;
    empty_row_right = 0;
@@ -503,6 +506,8 @@ void Findline::edge_calculate(){
 
 }
 
+
+//得到midline，这是赛道的中线的点集，使用方法：midline[i]，得到中线的列坐标，行是i
 void Findline::midline_calculate(){
     std::array<int,240> leftpoint;
     std::array<int,240> rightpoint;
@@ -510,16 +515,16 @@ void Findline::midline_calculate(){
     rightpoint.fill(315);
     endline_eight = 240;
     for(auto p : this->pointsEdgeLeft){
-      leftpoint[p.row] = p.col;
+      leftpoint[p.row] = p.col;                  //防止一行出现多个边界时的报错
       endline_eight = min(p.row,endline_eight);
     };
     for(auto p : this->pointsEdgeRight){
       rightpoint[p.row] = p.col;
       endline_eight = min(p.row,endline_eight);
     };
-    endline_eight++;
+    endline_eight++;                           //最后一个点的z轴坐标+1
     this->midline.fill(160);
-    if(line_type == LineType::STRAIGHT){
+    if(line_type == LineType::STRAIGHT){       //你TMD变过么？在这文档————cl
         for(int i = 238 ;i >=0 ; i--){
             if((leftpoint[i]==4)&&(rightpoint[i]==315)){
                 midline[i]=midline[i+1];
@@ -529,36 +534,10 @@ void Findline::midline_calculate(){
             }
         }
     }
-
-
 }
 
 
-
-
-
-
-
-
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//判定有没有向左转
 int Findline::zuodandiao() {
     int num_4=0;
     int num_5=0;
@@ -575,7 +554,7 @@ int Findline::zuodandiao() {
    }
 }
 for(int i=dir_l.size()/8;i<dir_l.size()*20/24;i++){//18/24
-    if(dir_l[i]==7||dir_l[i]==8){
+    if(dir_l[i]==7||dir_l[i]==8){           //8？？？？？你他妈的不是前面已经删了么，wcnmd
         num_78++;
    }
 }
@@ -614,6 +593,9 @@ for(int i=left_point.size()/8;i<left_point.size()-5;i++){//18/24
 //     zuo_num=0;
 //    }
 }
+
+
+//判定有没有向右转
 int Findline::youdandiao() {
     int num_4=0;
     int num_5=0;
@@ -672,11 +654,7 @@ int Findline::youdandiao() {
 }
 
 
-
-
-
-
-
+//有没有向左大拐弯
 int Findline::zuo_dan_diao_width(){
     int num=0;
    for(int i=0;i<dir_l.size()*3/4;i++){
@@ -699,6 +677,7 @@ int Findline::zuo_dan_diao_width(){
 }
 
 
+//有没有向右大拐弯
 int Findline::you_dan_diao_width(){
      int num=0;
    for(int i=0;i<dir_r.size()*3/4;i++){
