@@ -5,14 +5,14 @@
 #include <iostream>
 
 // 构造函数
-Ring::Ring() {
-    reset();
+Ring::Ring() { 
+    reset(); 
 }
 
 // 重置函数
 void Ring::reset() {
-    ringType = RingType::RingNone;
-    ringStep = RingStep::None;
+    RingType ringType = RingType::RingNone;
+    RingStep ringStep = RingStep::None;
     repairline_straight = 30;
 
     ring_state_right.fill(0);
@@ -174,6 +174,7 @@ int Ring::check_exit_corner_left(Findline &findline) {
 
 // 获取上拐点
 int Ring::get_up_corner(Findline &findline) {
+    cv::Point corner_up_point {0,0};
     if (findline.pointsEdgeRight.empty() || findline.pointsEdgeLeft.empty()) {
         return 0;
     }
@@ -190,6 +191,7 @@ int Ring::get_up_corner(Findline &findline) {
 
 // 获取中拐点
 int Ring::get_mid_corner(Findline &findline) {
+    cv::Point corner_mid_point{0,0};
     if (findline.pointsEdgeRight.size() < 10 || findline.pointsEdgeLeft.size() < 10) {
         return 0;
     }
@@ -206,6 +208,7 @@ int Ring::get_mid_corner(Findline &findline) {
 
 // 获取下拐点
 int Ring::get_down_corner(Findline &findline) {
+    cv::Point corner_down_point{0,0};
     if (findline.pointsEdgeRight.empty() || findline.pointsEdgeLeft.empty()) {
         return 0;
     }
@@ -220,8 +223,9 @@ int Ring::get_down_corner(Findline &findline) {
     return 0;
 }
 
-// 获取边缘拐点
+// 获取入环拐点
 int Ring::get_edge_corner(Findline &findline) {
+    cv::Point corner_edge_point {0,0};
     for (int i = 0; i < findline.pointsEdgeRight.size(); ++i) {
         if (findline.pointsEdgeRight[i].y > 250) { // 假设阈值
             corner_edge_point = findline.pointsEdgeRight[i];
@@ -237,6 +241,7 @@ int Ring::get_edge_corner(Findline &findline) {
 
 // 获取出口拐点
 int Ring::get_exit_corner(Findline &findline) {
+    cv::Point corner_exit_point {0,0};
     for (int i = 0; i < findline.pointsEdgeLeft.size(); ++i) {
         if (findline.pointsEdgeLeft[i].y < 50) { // 假设阈值
             corner_exit_point = findline.pointsEdgeLeft[i];
@@ -250,7 +255,7 @@ int Ring::get_exit_corner(Findline &findline) {
     return 0;
 }
 
-// 图像到入环
+// 预入环判定
 int Ring::image_to_enter(Findline &findline) {
     // 示例逻辑：检测特定的线条模式以判断是否进入环岛
     if (findline.pointsEdgeRight.size() > NO_LINE_RIGHT_Y && findline.pointsEdgeLeft.size() > NO_LINE_LEFT_X) {
@@ -259,34 +264,110 @@ int Ring::image_to_enter(Findline &findline) {
     return 0;
 }
 
-// 修复出环赛道线
-void Ring::repair_line_exit(Findline &findline) {
-    for (int i = 0; i < findline.pointsEdgeLeft.size(); ++i) {
-        if (findline.pointsEdgeLeft[i].x < NO_LINE_LEFT_X) {
-            findline.pointsEdgeLeft[i] = cv::Point(NO_LINE_LEFT_X, findline.pointsEdgeLeft[i].y);
-        }
-    }
-}
 
 // 修复预入环赛道线
 void Ring::repair_line_prev(Findline &findline) {
-    for (int i = 0; i < findline.pointsEdgeRight.size(); ++i) {
-        if (findline.pointsEdgeRight[i].x > NO_LINE_RIGHT_Y) {
-            findline.pointsEdgeRight[i] = cv::Point(NO_LINE_RIGHT_Y, findline.pointsEdgeRight[i].y);
+    std::vector<cv::Point> new_right_point;
+    std::vector<cv::Point> new_left_point;
+
+    if (ringType == RingType::RingRight) {                            // 右入环：
+        for(int i = 1; i <= repairline_straight; ++i){
+
+            double t = static_cast<double>(i) / (repairline_straight + 1);
+            double new_x = corner_mid_point.x + t * (corner_down_point.x - corner_mid_point.x);
+            double new_y = corner_mid_point.y + t * (corner_down_point.y - corner_mid_point.y);
+            
+            cv::Point new_point(static_cast<int>(new_x), static_cast<int>(new_y));
+            new_right_point.emplace_back(new_point);
         }
+        // 将生成的新点添加到findline.right_point
+        findline.right_point.insert(pointsEdgeRight.end(), new_right_point.begin(), new_right_point.end());
+    }
+    else {                                                              // 左入环：
+        for(int i = 1; i <= repairline_straight; ++i){
+            double t = static_cast<double>(i) / (repairline_straight + 1);
+            
+            double new_x = corner_mid_point.x + t * (corner_down_point.x - corner_mid_point.x);
+            double new_y = corner_mid_point.y + t * (corner_down_point.y - corner_mid_point.y);
+            
+            cv::Point new_point(static_cast<int>(new_x), static_cast<int>(new_y));
+            new_left_point.emplace_back(new_point);
+        }
+        // 将生成的新点添加到findline.left_point
+        findline.left_point.insert(pointsEdgeLeft.end(), new_left_point.begin(), new_left_point.end());
     }
 }
 
-// 通用补线函数
+
+// 修复入环赛道线
 void Ring::repair_line(Findline &findline) {
-    if (ringStep == RingStep::Entering) {
-        repair_line_prev(findline);
-    } else if (ringStep == RingStep::Exiting) {
-        repair_line_exit(findline);
+    std::vector<cv::Point> new_right_point;
+    std::vector<cv::Point> new_left_point;
+    if (ringType == RingType::RingLeft) {                           // 左入环
+        for(int i = 1; i <= repairline_straight; ++i){
+
+            double t = static_cast<double>(i) / (repairline_straight + 1);
+            double new_x = corner_up_point.x + t * (corner_edge_point.x - corner_up_point.x);
+            double new_y = corner_up_point.y + t * (corner_edge_point.y - corner_up_point.y);
+            
+            cv::Point new_point(static_cast<int>(std::round(new_x)), static_cast<int>(std::round(new_y)));
+            new_right_point.emplace_back(new_point);
+        }
+        // 将生成的新点添加到findline.right_point
+        findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
+    }
+    else {                                                             // 右入环：     
+        for(int i = 1; i <= repairline_straight; ++i){
+
+            double t = static_cast<double>(i) / (repairline_straight + 1);
+            double new_x = corner_up_point.x + t * (corner_edge_point.x - corner_up_point.x);
+            double new_y = corner_up_point.y + t * (corner_edge_point.y - corner_up_point.y);
+            
+            cv::Point new_point(static_cast<int>(std::round(new_x)), static_cast<int>(std::round(new_y)));
+            new_left_point.emplace_back(new_point);
+        }
+        // 将生成的新点添加到findline.left_point
+        findline.left_point.insert(findline.left_point.end(), new_left_point.begin(), new_left_point.end());
     }
 }
 
-// 判断是否为直线
+
+
+// 修复出环赛道线
+void Ring::repair_line_exit(Findline &findline) {
+    std::vector<cv::Point> new_right_point;
+    std::vector<cv::Point> new_left_point;
+    if (ringType == RingType::RingLeft) {                              // 左入环：
+        for(int i = 1; i <= repairline_straight; ++i){                 
+
+            double t = static_cast<double>(i) / (repairline_straight + 1);
+            double new_x = corner_down_point.x + t * (corner_exit_point.x - corner_down_point.x);
+            double new_y = corner_down_point.y + t * (corner_exit_point.y - corner_down_point.y);
+            
+            cv::Point new_point(static_cast<int>(std::round(new_x)), static_cast<int>(std::round(new_y)));
+            new_right_point.emplace_back(new_point);
+        }
+        // 将生成的新点添加到findline.right_point
+        findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
+    }
+    else {                                                             // 右入环：
+        for(int i = 1; i <= repairline_straight; ++i){
+
+            double t = static_cast<double>(i) / (repairline_straight + 1);
+            double new_x = corner_down_point.x + t * (corner_exit_point.x - corner_down_point.x);
+            double new_y = corner_down_point.y + t * (corner_exit_point.y - corner_down_point.y);
+
+            cv::Point new_point(static_cast<int>(std::round(new_x)), static_cast<int>(std::round(new_y)));
+            new_left_point.emplace_back(new_point);
+        }
+        // 将生成的新点添加到findline.left_point
+        findline.left_point.insert(findline.left_point.end(), new_left_point.begin(), new_left_point.end());
+    }
+}
+
+
+
+// 判断是否为直线（判定是否出环）
 bool Ring::straight_line_judge(std::vector<int> dir) {
     int count = 0;
     for (auto d : dir) {

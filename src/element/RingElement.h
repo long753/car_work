@@ -53,10 +53,10 @@ public:
   int corner_exit_index= 0;
   int corner_exit_update_count = 0; //出环拐点更新计数
   
-  int exit_flag=0;
-  int Entering_flag=0;
+  int exit_flag=0;//出环标记
+  int Entering_flag=0;//入环标记
 
-  int inside_flag=0;
+  int inside_flag=0;//环中标记
   
   StopWatch Entering_time;
   StopWatch pre_entering_timer;
@@ -90,7 +90,9 @@ public:
   void repair_line_prev(Findline & fidnline);
   void repair_line(Findline & fidnline);
   int get_edge_corner(Findline & findline);
+  int get_exit_corner(Findline & findline);
   bool straight_line_judge(std::vector<int> dir);
+
 
   auto get_draw_task(){
     return [*this](cv::Mat img){
