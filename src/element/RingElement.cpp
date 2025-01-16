@@ -297,7 +297,7 @@ void Ring::repair_line_prev(Findline &findline) {
         findline.left_point.insert(pointsEdgeLeft.end(), new_left_point.begin(), new_left_point.end());
     }
 }
-
+  
 
 // 修复入环赛道线
 void Ring::repair_line(Findline &findline) {
