@@ -55,25 +55,29 @@ public:
   
   int exit_flag=0;//出环标记
   int Entering_flag=0;//入环标记
-
   int inside_flag=0;//环中标记
   
-  StopWatch Entering_time;
-  StopWatch pre_entering_timer;
-  StopWatch pre_entering_to_entering;
-  StopWatch inside_to_exiting;
-  StopWatch entering_to_inside;
-  StopWatch reset_time;
+  //等我以后看完陀螺仪的相关代码之后再来动，现在动不了，插个眼，插个眼，插个眼，插个眼，插个眼
+  //StopWatch Entering_time;
+  //StopWatch pre_entering_timer;
+  //StopWatch pre_entering_to_entering;
+  //StopWatch inside_to_exiting;
+  //StopWatch entering_to_inside;
+  //StopWatch reset_time;
+  //StopWatch timer1;
+  //float start_angle;
 
-  float start_angle;
-  Ring();
+
+  //5个拐点的坐标
   cv::Point corner_up_point {0,0};
   cv::Point corner_mid_point{0,0};
   cv::Point corner_down_point{0,0};
   cv::Point corner_edge_point {0,0};
   cv::Point corner_exit_point {0,0};
 
-  StopWatch timer1;
+
+  //需要写的函数
+  Ring();  
   void reset();
   void circle_search(Findline & findline,float angle);
   int check_far_corner_right(Findline &findline);
@@ -82,7 +86,7 @@ public:
   int check_far_corner_left(Findline & findline);
   int check_near_corner_left(Findline & findline);
   int check_exit_corner_left(Findline & findline);
-  int get_up_corner(Findline & findline);
+  int get_up_corner(Findline & findline); 
   int get_mid_corner(Findline & findline);
   int get_down_corner(Findline & findline);
   int image_to_enter(Findline & findline);
