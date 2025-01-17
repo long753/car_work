@@ -355,6 +355,8 @@ void Ring::repair_line_prev(Findline &findline) {
         }
         // 将生成的新点添加到findline.right_point
         findline.right_point.insert(pointsEdgeRight.end(), new_right_point.begin(), new_right_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
     else {                                                              // 左入环：
         for(int i = 1; i <= repairline_straight; ++i){
@@ -368,12 +370,14 @@ void Ring::repair_line_prev(Findline &findline) {
         }
         // 将生成的新点添加到findline.left_point
         findline.left_point.insert(pointsEdgeLeft.end(), new_left_point.begin(), new_left_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
 }
   
 
 // 修复入环赛道线
-void Ring::repair_line(Findline &findline) {
+void Ring::repair_line_enter(Findline &findline) {
     std::vector<cv::Point> new_right_point;
     std::vector<cv::Point> new_left_point;
     if (ringType == RingType::RingLeft) {                           // 左入环
@@ -388,6 +392,8 @@ void Ring::repair_line(Findline &findline) {
         }
         // 将生成的新点添加到findline.right_point
         findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
     else {                                                             // 右入环：     
         for(int i = 1; i <= repairline_straight; ++i){
@@ -401,6 +407,8 @@ void Ring::repair_line(Findline &findline) {
         }
         // 将生成的新点添加到findline.left_point
         findline.left_point.insert(findline.left_point.end(), new_left_point.begin(), new_left_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
 }
 
@@ -422,6 +430,8 @@ void Ring::repair_line_exit(Findline &findline) {
         }
         // 将生成的新点添加到findline.right_point
         findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
     else {                                                             // 右入环：
         for(int i = 1; i <= repairline_straight; ++i){
@@ -435,12 +445,14 @@ void Ring::repair_line_exit(Findline &findline) {
         }
         // 将生成的新点添加到findline.left_point
         findline.left_point.insert(findline.left_point.end(), new_left_point.begin(), new_left_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
 }
 
 
 // 修复结束时的赛道线
-void Ring::repair_line_exit(Findline &findline) {
+void Ring::repair_line_finish(Findline &findline) {
     std::vector<cv::Point> new_right_point;
     std::vector<cv::Point> new_left_point;
     if (ringType == RingType::RingLeft) {                              // 左入环：
@@ -455,6 +467,8 @@ void Ring::repair_line_exit(Findline &findline) {
         }
         // 将生成的新点添加到findline.right_point
         findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
     else {                                                             // 右入环：
         for(int i = 1; i <= repairline_straight; ++i){
@@ -468,6 +482,8 @@ void Ring::repair_line_exit(Findline &findline) {
         }
         // 将生成的新点添加到findline.left_point
         findline.left_point.insert(findline.left_point.end(), new_left_point.begin(), new_left_point.end());
+        findline.edge_calculate();
+        findline.midline_calculate();
     }
 }
 
