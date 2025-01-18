@@ -9,19 +9,15 @@
 Ring::Ring() { 
     corner_up_index = 0;
     corner_up_update_count = 0;
-
     corner_mid_index = 0;
     corner_mid_update_count = 0;
-
     corner_down_index = 0;
     corner_down_update_count = 0;
-
     corner_edge_index = 0;
     corner_edge_update_count = 0;
-
     corner_exit_index = 0;
     corner_exit_update_count = 0;
-    
+
 }
 
 
@@ -78,26 +74,22 @@ void Ring::reset() {
 void Ring::circle_search(Findline &findline, float angle) {
     if (image_to_enter == 1) {
 
-        // 判断是否ringStep是否发生变化，同时对每一个阶段进行相应计算
+        // 判断是否ringStep是否发生变化，同时对每一个阶段进行相应操作
 
         // 预入环
         if (ringStep == RingStep::PreEntering){
 
             //预入环操作
-
-
-
-
-
-
-
+            check_corner(findline);
+            int find_up_corner = get_up_corner(findline);
+            int find_mid_corner = get_mid_corner(findline);
+            int find_down_corner = get_down_corner(findline);
+            repair_line_prev(findline);
 
             // 判断是否更新
-            if (ring.get_mid_cornor() == 0 && ring.get_up_cornor() == 1) {
-
-                ring.ringStep = Ring::Entry;  
-                ring.Entering_flag = 1;       
-                ring.repair_line(ring.findline);
+            if (find_mid_corner == 0 && find_up_corner == 1) {
+                ringStep = RingStep::Entering;  
+                Entering_flag = 1;       
             }
         }
 
@@ -105,108 +97,74 @@ void Ring::circle_search(Findline &findline, float angle) {
         else if (ringStep == RingStep::Entering){
 
             //入环操作
-
-
-
-
-
-
-
+            check_corner(findline);
+            int find_up_corner = get_up_corner(findline);
+            repair_line_enter(findline);
 
             // 判断是否更新
-            if (ring.get_up_cornor() == 0 && 
-                ring.check_far_corner_right() == 0 && 
-                ring.check_far_corner_left() == 0) {
-
-                if (ring.ringType == Ring::RingRight) {
-                    // 如果是右入环，检查左近拐点
-                    if (ring.check_near_corner_left() == 0) {
-                        ring.ringStep = Ring::Inside;  
-                        ring.inside_flag = 1;          
-                    }
-                } 
-                else if (ring.ringType == Ring::RingLeft) {
-                    // 如果是左入环，检查右近拐点
-                    if (ring.check_near_corner_right() == 0) {
-                        ring.ringStep = Ring::Inside;  
-                        ring.inside_flag = 1;          
-                    }
-                }
+            if (find_up_corner == 0 && Entering_flag == 1) {
+                ringStep = RingStep::Inside;  
+                inside_flag = 1;          
             }
         }
 
         // 环内
         else if (ringStep == RingStep::Inside){
 
-
-
+            //环内操作
+            check_corner(findline);
+            if (ringType == RingType::RingRight){
+                int find_eixt_corner = check_exit_corner_right(findline);
+            }
+            else if (ringType == RingType::RingLeft){
+                int find_eixt_corner = check_exit_corner_left(findline);
+            }
 
             // 判断是否更新
-            if (ring.get_up_corner() == 0) {
-                if (ring.ringType == Ring::RingRight) {
-                    // 如果是右入环，检查左近拐点、右远拐点、左远拐点
-                    if (ring.check_near_corner_left() == 1 || 
-                        ring.check_far_corner_right() == 1 || 
-                        ring.check_far_corner_left() == 1) {
-                        ring.ringStep = Ring::Exiting;  
-                        ring.repair_line_exit(Findline & findline);
-                        ring.Entering_flag = 1;        
-                    }
-                } 
-                else if (ring.ringType == Ring::RingLeft) {
-                    // 如果是左入环，检查右近拐点、右远拐点、左远拐点
-                    if (ring.check_near_corner_right() == 1 || 
-                        ring.check_far_corner_right() == 1 || 
-                        ring.check_far_corner_left() == 1) {
-                        ring.ringStep = Ring::Exiting;  
-                        ring.repair_line_exit(Findline & findline);
-                        ring.Entering_flag = 1;         
-                    }
-                }
+            if (find_eixt_corner == 1 && inside_flag == 1) {
+                ringStep = RingStep::Exiting;  
+                exit_flag = 1;  
             }
         }
 
         // 出环
         else if (ringStep == RingStep::Exiting){
 
-
-
+            //出环操作
+            //check_corner(findline);
+            //int find_up_corner = get_up_corner(findline);
+            repair_line_exit(findline);
 
             // 判断是否更新
-            if (ring.ringType == Ring::RingRight) {
-                if (ring.straight_line_judge(ring.dir_l)) {
-                    if (ring.get_up_corner() == 1) {
-                        ring.ringStep = Ring::Finish;  
-                    }
-                }
-            } 
-            else if (ring.ringType == Ring::RingLeft) {
-                if (ring.straight_line_judge(ring.dir_r)) {                   
-                    if (ring.get_up_corner() == 1) {
-                        ring.ringStep = Ring::Finish;  
-                    }
-                }
+            if(ringType == RingType::RingRight && straight_line_judge(findline.dir_l) && exit_flag == 1){
+                ringStep = RingStep::Finish;  
+                reset();
+            }
+            if(ringType == RingType::RingLeft && straight_line_judge(findline.dir_r) && exit_flag == 1){
+                ringStep = RingStep::Finish;  
+                reset();
             }
         }
 
-        // 完成
+        // 结束,考虑删除此状态，似乎影响不大
         else if (ringStep == RingStep::Finish){
 
-
-
-
+            //结束操作
+            check_corner(findline);
+            int find_up_corner = get_up_corner(findline);
+            repair_line_finish(findline);
 
             // 判断是否更新
-            if (ring.get_up_corner() == 0) {
-                ring.reset();
+            if (straight_line_judge(findline.dir_l) && straight_line_judge(findline.dir_r)) {
+                reset();
             }
         }
     }
 }
 
 
-//检擦拐点,只包含了进入圆环时的拐点检测，出圆环的那个拐点有点诡异，需要单独写。
-int Ring::check_up_corner(Findline &findline) {
+//检擦拐点,只包含了进入圆环时的拐点检测，出圆环的那个拐点有点诡异，需要单独写。效率不高，需要重新写
+int Ring::check_corner(Findline &findline) {
     std::vector<int> suspect_right_corner;
     std::vector<int> suspect_left_corner;
     std::vector<int> suspect_right_mid_corner;
@@ -796,48 +754,46 @@ int Ring::get_up_corner(Findline &findline) {
     if (corner_up_index != 0) {
         
         if (findline.ringType == RingRight) {
-            ring::corner_up_point = findline.right_point[corner_up_index];
+            corner_up_point = findline.right_point[corner_up_index];
             return 1; 
         }
         
         else if (findline.ringType == RingLeft) {
-            ring::corner_up_point = findline.left_point[corner_up_index];
+            corner_up_point = findline.left_point[corner_up_index];
             return 1; 
         }
     }
     return 0;
 }
-
 
 // 获取中拐点
 int Ring::get_mid_corner(Findline &findline) {
     if (corner_mid_index != 0) {
         
         if (findline.ringType == RingRight) {
-            ring::corner_mid_point = findline.right_point[corner_mid_index];
+            corner_mid_point = findline.right_point[corner_mid_index];
             return 1; 
         }
         
         else if (findline.ringType == RingLeft) {
-            ring::corner_mid_point = findline.left_point[corner_mid_index];
+            corner_mid_point = findline.left_point[corner_mid_index];
             return 1; 
         }
     }
     return 0;
 }
 
-
 // 获取下拐点
 int Ring::get_down_corner(Findline &findline) {
     if (corner_down_index != 0) {
         
         if (findline.ringType == RingRight) {
-            ring::corner_down_point = findline.right_point[corner_down_index];
+            corner_down_point = findline.right_point[corner_down_index];
             return 1; 
         }
         
         else if (findline.ringType == RingLeft) {
-            ring::corner_down_point = findline.left_point[corner_down_index];
+            corner_down_point = findline.left_point[corner_down_index];
             return 1; 
         }
     }
@@ -846,7 +802,6 @@ int Ring::get_down_corner(Findline &findline) {
 
 // 获取入环拐点
 int Ring::get_edge_corner(Findline &findline) {
-    cv::Point corner_edge_point {0,0};
     for (int i = 0; i < findline.pointsEdgeRight.size(); ++i) {
         if (findline.pointsEdgeRight[i].y > 250) { // 假设阈值
             corner_edge_point = findline.pointsEdgeRight[i];
@@ -862,7 +817,6 @@ int Ring::get_edge_corner(Findline &findline) {
 
 // 获取出环拐点
 int Ring::get_exit_corner(Findline &findline) {
-    cv::Point corner_exit_point {0,0};
     for (int i = 0; i < findline.pointsEdgeLeft.size(); ++i) {
         if (findline.pointsEdgeLeft[i].y < 50) { // 假设阈值
             corner_exit_point = findline.pointsEdgeLeft[i];
@@ -878,7 +832,6 @@ int Ring::get_exit_corner(Findline &findline) {
 
 // 检测到圆环存在,判断入环方向
 int Ring::image_to_enter(Findline &findline) {
-
     if (straight_line_judge(findline.dir_l) ^ straight_line_judge(findline.dir_r)) {
         ringStep = RingStep::PreEntering;
 
@@ -897,49 +850,37 @@ int Ring::image_to_enter(Findline &findline) {
 
 // 修复预入环赛道线
 void Ring::repair_line_prev(Findline &findline) {
-    std::vector<cv::Point> new_right_point;
-    std::vector<cv::Point> new_left_point;
+    std::vector<cv::Point> new_points;
 
-    if (ringType == RingType::RingRight) {                            // 右入环：
-        for(int i = 1; i <= repairline_straight; ++i){
+    for(int i = 1; i <= repairline_straight; ++i){
 
-            double t = static_cast<double>(i) / (repairline_straight + 1);
-            double new_x = corner_mid_point.x + t * (corner_down_point.x - corner_mid_point.x);
-            double new_y = corner_mid_point.y + t * (corner_down_point.y - corner_mid_point.y);
+        double tx = (static_cast<double>(i) * (300 - corner_up_point.x)) / ((repairline_straight + 1) * (corner_mid_point.x - corner_up_point.x));
+        double ty = (static_cast<double>(i) * (220 - corner_up_point.y)) / ((repairline_straight + 1) * (corner_mid_point.y - corner_up_point.y));
+        double new_x = corner_up_point.x + tx * (corner_mid_point.x - corner_up_point.x);
+        double new_y = corner_up_point.y + ty * (corner_mid_point.y - corner_up_point.y);
             
-            cv::Point new_point(static_cast<int>(int(new_x)), static_cast<int>(int(new_y)));
-            new_right_point.emplace_back(new_point);
-        }
-        // 将生成的新点添加到findline.right_point
-        findline.right_point.insert(pointsEdgeRight.end(), new_right_point.begin(), new_right_point.end());
-        findline.edge_calculate();
-        findline.midline_calculate();
+        cv::Point new_point(static_cast<int>(new_x), static_cast<int>(new_y));
+        new_points.emplace_back(new_point);
     }
-    else {                                                              // 左入环：
-        for(int i = 1; i <= repairline_straight; ++i){
-            double t = static_cast<double>(i) / (repairline_straight + 1);
-            
-            double new_x = corner_mid_point.x + t * (corner_down_point.x - corner_mid_point.x);
-            double new_y = corner_mid_point.y + t * (corner_down_point.y - corner_mid_point.y);
-            
-            cv::Point new_point(static_cast<int>(new_x), static_cast<int>(new_y));
-            new_left_point.emplace_back(new_point);
-        }
-        // 将生成的新点添加到findline.left_point
-        findline.left_point.insert(pointsEdgeLeft.end(), new_left_point.begin(), new_left_point.end());
-        findline.edge_calculate();
-        findline.midline_calculate();
+
+    if (ringType == RingType::RingRight) {                          
+        findline.right_point.insert(findline.right_point.end(), new_points.begin(), new_points.end());
     }
+    else {                                                           
+        findline.left_point.insert(findline.left_point.end(), new_points.begin(), new_points.end());
+    }
+
+    findline.edge_calculate();
+    findline.midline_calculate();
 }
-  
+
 
 // 修复入环赛道线
 void Ring::repair_line_enter(Findline &findline) {
     std::vector<cv::Point> new_right_point;
     std::vector<cv::Point> new_left_point;
 
-    // 如果ringType是RingRight
-    if (this->ringType == RingType::RingRight) {
+    if (ringType == RingType::RingRight) {
         float b = 200;  
         float k = -1.0 / 3.0;  
 
@@ -951,8 +892,7 @@ void Ring::repair_line_enter(Findline &findline) {
 
         findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
     }
-    // 如果ringType是RingLeft
-    else if (this->ringType == RingType::RingLeft) {
+    else if (ringType == RingType::RingLeft) {
         float b = 200;  
         float k = 1.0 / 3.0;  
 
@@ -975,36 +915,34 @@ void Ring::repair_line_enter(Findline &findline) {
 void Ring::repair_line_exit(Findline &findline) {
     std::vector<cv::Point> new_right_point;
     std::vector<cv::Point> new_left_point;
-    if (ringType == RingType::RingLeft) {                              // 左入环：
-        for(int i = 1; i <= repairline_straight; ++i){                 
 
-            double t = static_cast<double>(i) / (repairline_straight + 1);
-            double new_x = corner_down_point.x + t * (corner_exit_point.x - corner_down_point.x);
-            double new_y = corner_down_point.y + t * (corner_exit_point.y - corner_down_point.y);
-            
-            cv::Point new_point(static_cast<int>(std::round(new_x)), static_cast<int>(std::round(new_y)));
-            new_right_point.emplace_back(new_point);
+    if (ringType == RingType::RingRight) {
+        float b = 200;  
+        float k = -1.0 / 3.0;  
+
+        for (int i = 0; i < 30; ++i) {
+            float x = (float)i * (320.0f / 29);  
+            float y = k * x + b;  
+            new_right_point.emplace_back((int)x, (int)y);
         }
-        // 将生成的新点添加到findline.right_point
+
         findline.right_point.insert(findline.right_point.end(), new_right_point.begin(), new_right_point.end());
-        findline.edge_calculate();
-        findline.midline_calculate();
     }
-    else {                                                             // 右入环：
-        for(int i = 1; i <= repairline_straight; ++i){
+    else if (ringType == RingType::RingLeft) {
+        float b = 200;  
+        float k = 1.0 / 3.0;  
 
-            double t = static_cast<double>(i) / (repairline_straight + 1);
-            double new_x = corner_down_point.x + t * (corner_exit_point.x - corner_down_point.x);
-            double new_y = corner_down_point.y + t * (corner_exit_point.y - corner_down_point.y);
-
-            cv::Point new_point(static_cast<int>(std::round(new_x)), static_cast<int>(std::round(new_y)));
-            new_left_point.emplace_back(new_point);
+        for (int i = 0; i < 30; ++i) {
+            float x = (float)i * (320.0f / 29);  
+            float y = k * x + b;  
+            new_left_point.emplace_back((int)x, (int)y);
         }
-        // 将生成的新点添加到findline.left_point
+
         findline.left_point.insert(findline.left_point.end(), new_left_point.begin(), new_left_point.end());
-        findline.edge_calculate();
-        findline.midline_calculate();
     }
+
+    findline.edge_calculate();
+    findline.midline_calculate();
 }
 
 

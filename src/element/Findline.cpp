@@ -524,7 +524,7 @@ void Findline::midline_calculate(){
     };
     endline_eight++;                           //最后一个点的z轴坐标+1
     this->midline.fill(160);
-    if(line_type == LineType::STRAIGHT){       //你TMD变过么？在这文档————cl
+    if(line_type == LineType::STRAIGHT){       
         for(int i = 238 ;i >=0 ; i--){
             if((leftpoint[i]==4)&&(rightpoint[i]==315)){
                 midline[i]=midline[i+1];
@@ -554,7 +554,7 @@ int Findline::zuodandiao() {
    }
 }
 for(int i=dir_l.size()/8;i<dir_l.size()*20/24;i++){//18/24
-    if(dir_l[i]==7||dir_l[i]==8){           //8？？？？？你他妈的不是前面已经删了么，wcnmd
+    if(dir_l[i]==7||dir_l[i]==8){           
         num_78++;
    }
 }
