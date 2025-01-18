@@ -39,7 +39,6 @@ bool Cross::cross_search(Findline &findline){
 					if(!suspect_left_corner.empty()){
 						suspect_left_corner.pop_back();
 					}
-				
 
 				}
 			}
@@ -61,13 +60,10 @@ bool Cross::cross_search(Findline &findline){
 			if(!left_line_type_and_count.empty()){
 				left_line_type_and_count.back().second++;
 			}
-
 			if(!suspect_left_corner.empty()){
 				suspect_left_corner.pop_back();
 			}
-
 			}
-		
 		}
 		
 		if(!left_line_type_and_count.empty()&& left_line_type_and_count.back().first ==2){
@@ -100,6 +96,7 @@ bool Cross::cross_search(Findline &findline){
 			}
 		}
   	}
+
 	//校验是否符合要求
 	bool LD_find =false;
 	bool LU_find = false;
@@ -116,7 +113,7 @@ bool Cross::cross_search(Findline &findline){
 				pointLD_index = suspect_left_corner[i];
 				LD_find = true;
 				}
-				
+
 			}
 			else if(left_line_type_and_count[i].first ==6 &&
 			(left_line_type_and_count[i+1].first ==4 ||left_line_type_and_count[i+1].first ==2)

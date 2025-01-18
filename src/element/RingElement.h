@@ -80,11 +80,14 @@ public:
   Ring();  
   void reset();
   void circle_search(Findline & findline,float angle);
+  int check_corner(Findline &findline)
   int check_far_corner_right(Findline &findline);
   int check_near_corner_right(Findline & findline);
+  int check_mid_corner_right(Findline & findline);
   int check_exit_corner_right(Findline & findline);
   int check_far_corner_left(Findline & findline);
   int check_near_corner_left(Findline & findline);
+  int check_mid_corner_left(Findline & findline);
   int check_exit_corner_left(Findline & findline);
   int get_up_corner(Findline & findline); 
   int get_mid_corner(Findline & findline);

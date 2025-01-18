@@ -374,7 +374,7 @@ void Findline::search_line(Mat & imgb){
 
         tmp_l.clear();
         tmp_dir_l.clear();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 8; i++) {  //i从0开始！！！！！！！！！！！！！！！！！
             int _x = center_l.x;
             int _y = center_l.y;
             if (tmp_img.at<uchar>(seeds_l[i].y+_y,seeds_l[i].x+_x) == 0 && tmp_img.at<uchar>(seeds_l[(i + 1) & 7].y+_y,seeds_l[(i + 1) & 7].x+_x) == 255) {
