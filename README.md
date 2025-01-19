@@ -160,14 +160,14 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 2.在电脑上打开终端，输入指令：
 
 ```bash
- ssh root@192.168.1.101     
+ ssh root@192.168.1.101    ( 或者： ssh root@paddlepi) 
 ```  
 3.输入edgeboard的密码：edgeboard，即可连接成功。
 
 4.打开vscode，安装插件Remote-SSH，打开“远程资源管理器”，在vscode最上面输入：
 
 ```bash
- ssh root@192.168.1.101
+ ssh root@paddlepi
 ```
 5.输入edgeboard的密码：edgeboard，即可连接成功。
 
@@ -186,21 +186,25 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 
 如果你还没有安装VNC，请打开网址`https://www.realvnc.com/en/connect/download/viewer/`，安装windows版本的VNC客户端，并按照安装提示安装好。
 
-在Windows系统的终端上，输入指令：
+进入系统后，输入指令：
 
 ```bash
  vncserver :1 --localhost no
 ```
 其中，“:1”表示图形化界面端口号，可以自行设置。优先使用1号端口，当端口被占用时，可以尝试其他端口。
 
+然后打开VNC,建立新的连接：
+vncserver：paddlepi:5901
+name: root
 
+进入后输入密码：edgeboard
 
 ### 4.编译文件
 
 在VNC界面中，打开终端，切换到工程目录，输入指令：
 
 ```bash
- cd /hoom/3group/build
+ cd /home/edgeboard/3group/build
 ```
 
 保存好修改的代码后，输入指令：
@@ -215,7 +219,7 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 在终端中，切换到工程目录，输入指令：
 
 ```bash
- cd /hoom/3group/build
+ cd /home/edgeboard/3group/build
  ./icar
 ```
 此时小车便成功启动，结束小车的运动只需在终端中输入指令`Ctrl+C`即可。  

@@ -58,14 +58,14 @@ public:
   int inside_flag=0;//环中标记
   
   //等我以后看完陀螺仪的相关代码之后再来动，现在动不了，插个眼，插个眼，插个眼，插个眼，插个眼
-  //StopWatch Entering_time;
-  //StopWatch pre_entering_timer;
-  //StopWatch pre_entering_to_entering;
-  //StopWatch inside_to_exiting;
-  //StopWatch entering_to_inside;
-  //StopWatch reset_time;
-  //StopWatch timer1;
-  //float start_angle;
+  StopWatch Entering_time;
+  StopWatch pre_entering_timer;
+  StopWatch pre_entering_to_entering;
+  StopWatch inside_to_exiting;
+  StopWatch entering_to_inside;
+  StopWatch reset_time;
+  StopWatch timer1;
+  float start_angle;
 
 
   //5个拐点的坐标
