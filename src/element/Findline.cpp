@@ -51,10 +51,10 @@ void Findline::search_line(Mat & imgb){
     dir_l.clear();
     dir_r.clear();
 
-    Mat tmp_img = imgb.clone();
+    Mat tmp_img = imgb.clone();//创建imgb的副本,防止修改原始图像
     
-    cv::morphologyEx(imgb, tmp_img, cv::MorphTypes::MORPH_OPEN, kernel); //开运算
-    cv::rectangle(tmp_img, Point(0, 0), Point(320, 240), 0, 5);
+    cv::morphologyEx(imgb, tmp_img, cv::MorphTypes::MORPH_OPEN, kernel); //开运算：主要用于清理图像中的噪声
+    cv::rectangle(tmp_img, Point(0, 0), Point(320, 240), 0, 5);//在tmp_img上绘制一个矩形
 
 
     ///////////////////////////////////////////////////////////////
@@ -243,7 +243,7 @@ void Findline::search_line(Mat & imgb){
    // cout<<endl<<"111111111111111:"<<(tmp_img.at<uchar>(200,120)==255)<<endl;
   ////////////////////////////////////////////////////////////////////
 
-
+//前面都是调参用的，没有什么参考价值
     std::unique_ptr<uint8_t[][240]> readed_point(new uint8_t[320][240]{ 0 }); //读取过的点
     bool l_flag = false;
     bool r_flag = false;
@@ -252,9 +252,10 @@ void Findline::search_line(Mat & imgb){
     cv::Point r_start{ 0,0 };
 
     // int imgh = ROWSIMAGE - 40;
-    auto mat_ptr = tmp_img.ptr<uchar>(CarParams->imgh);
-    for (int i = CarParams->imgh; i > CarParams->imgh - 3; i--) {
-        if (!r_flag) {
+    auto mat_ptr = tmp_img.ptr<uchar>(CarParams->imgh);//mat_ptr是指向tmp_img图像中第CarParams->imgh行的指针
+    //可能可以这么理解：CarParams是行号，mat_ptr是列号，mat_ptr[i]指向的便是tmp_img中[CarParams][i]的灰度值
+    for (int i = CarParams->imgh; i > CarParams->imgh - 3; i--) {//有点没懂，就循环3次？那剩下的高度呢？还是说CarParam有更新我没看到
+        if (!r_flag) {//
             for (int j = COLSIMAGE / 2; j < COLSIMAGE; j++) {
                 if (mat_ptr[j] == 255 && mat_ptr[j - 1] == 255 && mat_ptr[j - 2] == 255 &&mat_ptr[j - 4] == 255 &&mat_ptr[j - 6] == 255 &&
                 mat_ptr[j - 8] == 255 &&mat_ptr[j - 10] == 255 &&
@@ -264,7 +265,7 @@ void Findline::search_line(Mat & imgb){
                     r_start.y = i;
                     // std::cout << "1" << endl;
                     break;
-                }
+                }//寻找右边界，白到黑则确定该边界点，因为白色更多所以判断的区间更大
             }
         }
         if (!l_flag) {
@@ -277,14 +278,14 @@ void Findline::search_line(Mat & imgb){
                     l_start.y = i;
                     // std::cout << "2" << endl;
                     break;
-                }
+                }//同理，寻找左边界
             }
         }
         if (l_flag && r_flag) {
             break;
-        }
+        }//若左右边界均找到，跳出257行的for循环
         else {
-        if (!r_flag) {
+        if (!r_flag) {//右边界没找到，则直接暴力从图片最右边开始搜，模式切换为白到黑
             for (int j = COLSIMAGE - 3; j > 0; j--) {
                 if (mat_ptr[j] == 255 && mat_ptr[j - 4] == 255 && mat_ptr[j - 8] == 255 && mat_ptr[j - 15] == 255 && mat_ptr[j + 1] == 0 && mat_ptr[j + 2] == 0) {
                     r_flag = true;
@@ -296,7 +297,7 @@ void Findline::search_line(Mat & imgb){
                 }
             }
         }
-        if (!l_flag) {
+        if (!l_flag) {//同理，左边界没找到，切换搜索模式
             for (int j = 2; j < COLSIMAGE - 1; j++) {
                 if (mat_ptr[j] == 255 && mat_ptr[j +4] == 255 && mat_ptr[j + 8] == 255 && mat_ptr[j + 15] == 255 && mat_ptr[j - 1] == 0 && mat_ptr[j - 2] == 0) {
                     l_flag = true;
@@ -307,6 +308,7 @@ void Findline::search_line(Mat & imgb){
                 }
             }
         }
+        //这两个特殊的搜索边界的方法应该是用于某些视野中的特殊情况
         }
         if (l_flag && r_flag) {
             break;
@@ -319,19 +321,19 @@ void Findline::search_line(Mat & imgb){
         right_point.clear();
         return;
     }
-
+//该部分是寻找赛道二值化图像中的边界，
     vector<cv::Point> left_field;
     vector<cv::Point> right_field;
     int left_highest = 240;
     int right_highest = 240;
 
-
-    cv::Point center_l = l_start;
+//以下部分是基于八领域方法寻找每个边界点的生长方向
+    cv::Point center_l = l_start;//上一个模块中找到的边界点
     cv::Point center_r = r_start;
 
     vector<cv::Point> tmp_l;
     vector<cv::Point> tmp_r;
-    std::vector<int> tmp_dir_l;
+    std::vector<int> tmp_dir_l;//左生长方向
     std::vector<int> tmp_dir_r;
     while (true)
     {
@@ -345,11 +347,11 @@ void Findline::search_line(Mat & imgb){
         if (!left_point.empty()&&!left_stop && left_point.back().y < CarParams->rowCutUp){
             left_stop = true;
         }
-        if (left_stop && right_stop) break;
+        if (left_stop && right_stop) break;//搜索停止前置条件
 
-        left_point.emplace_back(center_l);
+        left_point.emplace_back(center_l);//向左边界点集合添加center_l
 
-        highest_row = min(center_l.y,highest_row);
+        highest_row = min(center_l.y,highest_row);//更新搜索最高高度
 
         if (readed_point[center_l.x][center_l.y] <= 3) {
             readed_point[center_l.x][center_l.y]++;
@@ -358,7 +360,7 @@ void Findline::search_line(Mat & imgb){
 
             left_stop = true;
 
-        }
+        }//对每个点进行遍历计数，center_l被遍历超过3次则停止该方向搜索
 
         right_point.emplace_back(center_r);
   
@@ -374,12 +376,13 @@ void Findline::search_line(Mat & imgb){
 
         tmp_l.clear();
         tmp_dir_l.clear();
-        for (int i = 0; i < 8; i++) {  //i从0开始！！！！！！！！！！！！！！！！！
+        for (int i = 0; i < 8; i++) {
             int _x = center_l.x;
             int _y = center_l.y;
             if (tmp_img.at<uchar>(seeds_l[i].y+_y,seeds_l[i].x+_x) == 0 && tmp_img.at<uchar>(seeds_l[(i + 1) & 7].y+_y,seeds_l[(i + 1) & 7].x+_x) == 255) {
                 tmp_l.emplace_back(seeds_l[i].x+_x,seeds_l[i].y+_y);
-                //生长方向
+                //(i+1)&7目的是为了将i+1的结果限制在0-7之间
+                //生长方向，其中seed[i]是提前定义好的八个方向坐标差值，详见Findline.h 63行内容
                 tmp_dir_l.emplace_back(i);
             }
 
@@ -396,7 +399,7 @@ void Findline::search_line(Mat & imgb){
                 }
                 _i++;
             }
-        }
+        }//意在检查tmp_l中是否有被检查次数为0的点，防止该点被遗漏
     
 
 
@@ -467,11 +470,11 @@ void Findline::edge_calculate(){
    empty_row_right = 0;
    std::vector<int> road_width;
     int high = 240;
-    for(auto _m : left_point){
+    for(auto _m : left_point){//以_m为形参遍历left_point容器
         if(_m.y != high){
             pointsEdgeLeft.emplace_back(_m);
             high = _m.y;
-            if(abs(_m.x-LEFT_EDGE_COL)<2 && _m.y > ROWSIMAGE * 0.3){
+            if(abs(_m.x-LEFT_EDGE_COL)<2 && _m.y > ROWSIMAGE * 0.3){//有效y视角内过于贴近边线的点不要
                 empty_row_left++;
             }
         }
@@ -498,7 +501,7 @@ void Findline::edge_calculate(){
     for(size_t i = 0 ;i < _size ;i++){
         int width = pointsEdgeRight[i].col-pointsEdgeLeft[i].col;
         if(width  >0 
-        && width  <= last_width){
+        && width  <= last_width){//近大远小的边线宽度才是所需的
             count ++ ;
             last_width = width;
         }
@@ -511,7 +514,7 @@ void Findline::edge_calculate(){
 void Findline::midline_calculate(){
     std::array<int,240> leftpoint;
     std::array<int,240> rightpoint;
-    leftpoint.fill(4);
+    leftpoint.fill(4);//将每个元素都设为4
     rightpoint.fill(315);
     endline_eight = 240;
     for(auto p : this->pointsEdgeLeft){
@@ -522,7 +525,7 @@ void Findline::midline_calculate(){
       rightpoint[p.row] = p.col;
       endline_eight = min(p.row,endline_eight);
     };
-    endline_eight++;                           //最后一个点的z轴坐标+1
+    endline_eight++;                           
     this->midline.fill(160);
     if(line_type == LineType::STRAIGHT){       
         for(int i = 238 ;i >=0 ; i--){
@@ -554,7 +557,7 @@ int Findline::zuodandiao() {
    }
 }
 for(int i=dir_l.size()/8;i<dir_l.size()*20/24;i++){//18/24
-    if(dir_l[i]==7||dir_l[i]==8){           
+    if(dir_l[i]==7||dir_l[i]==8){           //8？？？？？你他妈的不是前面已经删了么，wcnmd
         num_78++;
    }
 }
@@ -699,4 +702,5 @@ for(int i=dir_r.size()*9/10;i<dir_r.size()*9/10+5 && i<dir_r.size();i++){
    return 1;
 
 }
+
 

@@ -1268,9 +1268,6 @@ bool Ring::straight_line_judge(std::vector<int> dir) {
             }
 		}
     }
-    std::cout<<"line_type_and_count.size:"<<line_type_and_count.size()<<std::endl;
-    std::cout<<"suspect_corner.size:"<<suspect_corner.size()<<std::endl;
-    std::cout<<"dir.size:"<<dir.size()<<std::endl;
 
     //找拐点个数
    	if (line_type_and_count.size()>2){
@@ -1284,6 +1281,5 @@ bool Ring::straight_line_judge(std::vector<int> dir) {
     if(guai_count >= 3){   
         return false;
     }
-    std::cout<<"guai_cout:"<<guai_count<<std::endl;
     return true;
 }
