@@ -148,8 +148,8 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 ## 调试文档
 
 ### 1.打开小车
-  
-首先，观察小车的上位机，主控，驱动板的开关是否处于关闭状态（分别位于小车的左右两边）。其次，把电源插上，注意观察电池的电压，要在11.1v到12.6v之间，不要过充过放。最后，打开那三个开关，等待edgeboard上的指示灯显示为绿色，小车成功启动。  
+
+首先，观察小车的上位机，主控，驱动板的开关是否处于关闭状态（分别位于小车的左右两边）。其次，把电源插上，注意观察电池的电压，要在11.1v到12.6v之间，不要过充过放。最后，打开那三个开关，等待edgeboard上的指示灯显示为绿色，小车成功启动。  
 
 ### 2.连接电脑
 
@@ -158,24 +158,27 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 1.用网线连接路由器和智能小车，同时电脑也连接这个路由器，进入路由器的管理界面，找到智能小车的IP地址。
 
 2.在电脑上打开终端，输入指令：
+```
+ ssh root@192.168.1.101    ( 或者： ssh root@paddlepi)
 
-```bash
- ssh root@192.168.1.101    ( 或者： ssh root@paddlepi) 
-```  
+我们的机子：
+ssh edgeboard@baidu7zu
+```
+
 3.输入edgeboard的密码：edgeboard，即可连接成功。
 
 4.打开vscode，安装插件Remote-SSH，打开“远程资源管理器”，在vscode最上面输入：
-
-```bash
- ssh root@paddlepi
 ```
-5.输入edgeboard的密码：edgeboard，即可连接成功。
+ ssh root@paddlepi
+ 
+我们的机子：
+ssh edgeboard@baidu7zu
+```
 
+5.输入edgeboard的密码：edgeboard，即可连接成功。
 注意：请先完成VNC图形化界面的安装与连接，再进行无线连接。
 
-
 #### 2.2 无线连接
-
 第一次无线连接时：保证有线连接成功，在VNC图形化界面中，打开网络设置，直接连接你的热点即可。同时把你的电脑也连在你的热点下面。如果不是第一次连接，只需打开手机热点
 
 打开vscode，打开“远程资源管理器”，点击paddlepi，进行远程连接。
@@ -187,31 +190,37 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 如果你还没有安装VNC，请打开网址`https://www.realvnc.com/en/connect/download/viewer/`，安装windows版本的VNC客户端，并按照安装提示安装好。
 
 进入系统后，输入指令：
-
-```bash
- vncserver :1 --localhost no
 ```
+ vncserver :1 --localhost no
+```
+
 其中，“:1”表示图形化界面端口号，可以自行设置。优先使用1号端口，当端口被占用时，可以尝试其他端口。
 
 然后打开VNC,建立新的连接：
+```
 vncserver：paddlepi:5901
 name: root
 
-进入后输入密码：edgeboard
+我们的机子：
+vncserver：baidu7zu:5901
+name: edgeboard
+```
+进入后输入密码：`edgeboard`  我们的机子是：`baidu7zu`
 
 ### 4.编译文件
 
 在VNC界面中，打开终端，切换到工程目录，输入指令：
 
 ```bash
- cd /home/edgeboard/3group/build
+ cd /home/edgeboard/3group/build
 ```
 
 保存好修改的代码后，输入指令：
-
+  
 ```bash
- make icar -j3
+ make icar -j3
 ```
+
 其中，“icar”表示编译的目标文件，“-j3”表示使用三个线程编译，可以加快编译时间。这里的编译时间会根据你的修改程度而变化。
 
 ### 5.运行程序
@@ -219,7 +228,8 @@ name: root
 在终端中，切换到工程目录，输入指令：
 
 ```bash
- cd /home/edgeboard/3group/build
- ./icar
+ cd /home/edgeboard/3group/build
+ ./icar
 ```
-此时小车便成功启动，结束小车的运动只需在终端中输入指令`Ctrl+C`即可。  
+
+此时小车便成功启动，结束小车的运动只需在终端中输入指令`Ctrl+C`即可。

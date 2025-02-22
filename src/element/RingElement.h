@@ -98,7 +98,7 @@ public:
   void repair_line_finish(Findline &findline);
   int get_edge_corner(Findline & findline);
   int get_exit_corner(Findline & findline);
-  bool straight_line_judge(std::vector<int> dir);
+  bool straight_line_judge(std::vector<int> dir , std::vector<cv::Point> points);
 
 
   auto get_draw_task(){
