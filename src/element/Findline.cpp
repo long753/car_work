@@ -244,7 +244,7 @@ void Findline::search_line(Mat & imgb){
   ////////////////////////////////////////////////////////////////////
 
 //前面都是调参用的，没有什么参考价值
-    std::unique_ptr<uint8_t[][240]> readed_point(new uint8_t[320][240]{ 0 }); //读取过的点
+    std::vector<std::vector<uint8_t>> readed_point(320, std::vector<uint8_t>(240, 0)); //读取过的点
     bool l_flag = false;
     bool r_flag = false;
 
@@ -557,7 +557,7 @@ int Findline::zuodandiao() {
    }
 }
 for(int i=dir_l.size()/8;i<dir_l.size()*20/24;i++){//18/24
-    if(dir_l[i]==7||dir_l[i]==8){           //8？？？？？你他妈的不是前面已经删了么，wcnmd
+    if(dir_l[i]==7||dir_l[i]==8){   
         num_78++;
    }
 }
@@ -645,7 +645,8 @@ int Findline::youdandiao() {
    (num_5>ring_params->left_num4*num_4)&&
    (num_4>ring_params->left_num5*num_5)&&
    num_78<10&&abnormal<7&&dir_l.size()>400){//13/24
-    //cout<<"you"<<endl;
+    cout<<"you"<<endl;
+
     return 1;
     // you_num++;
    }

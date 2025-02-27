@@ -135,12 +135,6 @@ set(TEST_PROJECT_SOURCES test/main.cpp)
 add_executable(${TEST_PROJECT_NAME} ${TEST_PROJECT_SOURCES})
 target_link_libraries(${TEST_PROJECT_NAME} PUBLIC SMARTCAR)
 
-#八邻域测试
-set(TEST_PROJECT_NAME "test2")
-set(TEST_PROJECT_SOURCES test/icar_with8.cpp)
-add_executable(${TEST_PROJECT_NAME} ${TEST_PROJECT_SOURCES})
-target_link_libraries(${TEST_PROJECT_NAME} PUBLIC SMARTCAR)
-
 #旧代码测试
 set(TEST_PROJECT_NAME "test3")
 set(TEST_PROJECT_SOURCES test/old_code_test.cpp)
