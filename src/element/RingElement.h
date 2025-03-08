@@ -57,6 +57,7 @@ public:
   int Entering_flag=0;//入环标记
   int inside_flag=0;//环中标记
   
+  //等我以后看完陀螺仪的相关代码之后再来动，现在动不了，插个眼，插个眼，插个眼，插个眼，插个眼
   StopWatch Entering_time;
   StopWatch pre_entering_timer;
   StopWatch pre_entering_to_entering;
@@ -99,6 +100,11 @@ public:
   int get_exit_corner(Findline & findline);
   bool straight_line_judge(std::vector<int> dir , std::vector<cv::Point> points);
 
+  //测试
+  int check_corner( std::vector<int> &dir, std::vector<cv::Point> &points, int &corner_index, int type1, int type2);
+  int flag_far = 0;
+  int flag_mid = 0;
+  int flag_near = 0;
 
   auto get_draw_task(){
     return [*this](cv::Mat img){

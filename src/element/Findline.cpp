@@ -1,6 +1,18 @@
-#include "Findline.h"
 #include "RingElement.h"
+#include "Findline.h"
 #include <iostream>
+
+
+#include <opencv2/imgproc.hpp>
+#include <cmath>
+#include"uart.hpp"
+#include<stop_watch.hpp>
+#include<chrono>
+#include<thread>
+
+#define Down_Edge 10
+#define Up_Edge 50
+
 
 Findline::Findline(){
     ImageType imageType = ImageType::Binary; // 赛道识别输入图像类型：二值化图像
@@ -50,6 +62,21 @@ void Findline::search_line(Mat & imgb){
     right_point.clear();
     dir_l.clear();
     dir_r.clear();
+
+    // searchLine(imgb);
+    if (flag != 1){ 
+        Pre_wan();
+        std::cout<<"flag1:"<<flag_zuo_da<<std::endl;
+        std::cout<<"flag2:"<<flag_zuo_xiao<<std::endl;
+        std::cout<<"flag3:"<<flag_you_da<<std::endl;
+        std::cout<<"flag4:"<<flag_you_xiao<<std::endl;
+        // std::cout<<"qulv:"<<flag_zuo_xiao<<std::endl;
+    }
+    zuodaguai();
+    youdaguai();
+    zuoxiaoguai();
+    youxiaoguai();
+    
 
     Mat tmp_img = imgb.clone();//创建imgb的副本,防止修改原始图像
     
@@ -512,8 +539,8 @@ void Findline::edge_calculate(){
 
 //得到midline，这是赛道的中线的点集，使用方法：midline[i]，得到中线的列坐标，行是i
 void Findline::midline_calculate(){
-    std::array<int,240> leftpoint;
-    std::array<int,240> rightpoint;
+    // std::array<int,240> leftpoint;
+    // std::array<int,240> rightpoint;
     leftpoint.fill(4);//将每个元素都设为4
     rightpoint.fill(315);
     endline_eight = 240;
@@ -567,34 +594,15 @@ for(int i=left_point.size()/8;i<left_point.size()-5;i++){//18/24
         cout<<"col:"<<left_point[i].x<<",row:"<<left_point[i].y<<endl;
    }
 }
-//  if((num_4+num_5)>dir_r.size()*ring_params->right_num45){ //9/24
-//     cout<<"r1"<<endl;
-//    }
-//    if((num_5>ring_params->right_num4*num_4)){
-//     cout<<"r2"<<endl;
-//    }
-//    if((num_4>ring_params->right_num5*num_5)){ //0.3
-//     cout<<"r3"<<endl;
-//    }
-//    cout<<"zuo_num78:"<<num_78<<endl;
-//    cout<<"zuo_abnormal:"<<abnormal<<endl;
-//    cout<<"per:"<<(num_4+num_5+0.00001)/(dir_l.size()+0.000001)<<endl;
-//    cout<<"per_4"<<(num_4+0.000001)/(num_5+0.000001)<<endl;
-//    cout<<"pre_5"<<(num_5+0.000001)/(num_4+0.000001)<<endl;
  if((num_4+num_5)>dir_l.size()*ring_params->right_num45&&
     (num_5>ring_params->right_num4*num_4)&&
     (num_4>ring_params->right_num5*num_5)&&
     (num_78<10)&&abnormal<7&&dir_r.size()>400){
-     //zuo_num++;
-    //  cout<<"zuo"<<endl;
      return 1;
    }
   
 
    return 0;
-//    else{
-//     zuo_num=0;
-//    }
 }
 
 
@@ -704,4 +712,249 @@ for(int i=dir_r.size()*9/10;i<dir_r.size()*9/10+5 && i<dir_r.size();i++){
 
 }
 
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// std::array<int,241> midline_ex;
+
+// //目前所有的逻辑都是按左下角为坐标原点编写
+// cv::Mat change_M=(cv::Mat_<double>(3,3)<<1,0,0,0,1,0,0,0,1);//逆透视矩阵
+
+// void Findline::searchLine(Mat & imgb)
+// {
+// cv::Mat img_pro=imgb.clone();
+// cv::Mat img_used;//输出图像
+// cv::warpPerspective(img_pro,img_used,change_M,img_pro.size());//得到逆透视之后的图像
+
+// Findline data_copy;
+// std::vector<mpoint> left_copy=pointsEdgeLeft;//把边界左右点集都拷贝过来
+// std::vector<mpoint> right_copy=pointsEdgeRight;
+
+// for(auto& pt : left_copy){
+//     cv::Mat point_left=(cv::Mat_<double>(3,1)<<pt.col,pt.row,1);
+//     cv::Mat transformed_point=change_M*point_left;//边缘点变换
+
+//     pt.col=transformed_point.at<double>(0,0)/transformed_point.at<double>(2,0);
+//     pt.row=transformed_point.at<double>(1,0)/transformed_point.at<double>(2,0);
+// }
+
+// for(auto& pt : right_copy){
+//     cv::Mat point_right=(cv::Mat_<double>(3,1)<<pt.col,pt.row,1);
+//     cv::Mat transformed_point=change_M*point_right;
+
+//     pt.col=transformed_point.at<double>(0,0)/transformed_point.at<double>(2,0);
+//     pt.row=transformed_point.at<double>(1,0)/transformed_point.at<double>(2,0);
+// }
+
+// int mode,erupt;
+
+// //right_turn
+// mpoint inner_point_r={0,0};
+// for(int i=Up_Edge;i>=Down_Edge;i--){
+//     if(abs(right_copy[i].col-right_copy[i-5].col)>5&&!inner_point_r.col&&!inner_point_r.row)//扫描右边缘点，找到右拐内拐角点
+//     {
+//         inner_point_r=right_copy[i];
+//         erupt=i;
+//         break;
+//     }
+// }
+// for(int j=erupt-1;j>=max(0,erupt-25);j--){
+//     if(right_copy[j].row==inner_point_r.row){
+//         mode=2;//回转弯
+//         break;
+//     }
+//     else{
+//         mode=1;//90度弯
+//         break;
+//     }
+// }
+
+// mpoint inner_point_l={0,0};
+// for(int i=Up_Edge;i>=Down_Edge;i--){
+//     if(abs(left_copy[i].col-left_copy[i-5].col)>5&&!inner_point_l.col&&!inner_point_l.row)//扫描右边缘点，找到右拐内拐角点
+//     {
+//         inner_point_l=left_copy[i];
+//         erupt=i;
+//         break;
+//     }
+// }
+// for(int j=erupt-1;j>=max(0,erupt-25);j--){
+//     if(left_copy[j].row==inner_point_l.row){
+//         mode=2;//回转弯
+//         break;
+//     }
+//     else{
+//         mode=1;//90度弯
+//         break;
+//     }
+// }
+
+// std::cout<<mode<<endl;
+// Findline draw;
+// draw.drawImage(img_used,left_copy,right_copy);//画一下变换后的边线
+// }
+
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int Findline::qulv(std::array<int,240> points) {
+    std::vector<int> tmp_lst;
+    double dydx_1 = 0, dydx_2 = 0;
+    int count_wan = 0;
+    
+    // 去重逻辑修正
+    for (auto &p : points) {
+        if (tmp_lst.empty() || p != tmp_lst.back()) {
+            tmp_lst.push_back(p);
+        }
+    }
+    
+
+    for (size_t j = 1; j < tmp_lst.size() - 1; j++) {
+        dydx_1 = (tmp_lst[j+1] - tmp_lst[j]) ;
+        dydx_2 = (tmp_lst[j] - tmp_lst[j-1]) ;
+        
+        double curvature = abs(dydx_1 - dydx_2)  / 
+                            pow(1 + pow(dydx_2, 2), 1.5);
+        if (curvature > value) count_wan++;
+    }
+    std::cout<<"wan:"<<count_wan<<std::endl;
+   
+    return count_wan;
+}
+
+void Findline::Pre_wan(){ //判断远距离部分的曲率是否大，并且是否有开口，如果有就认为大左拐弯，封锁所有的标志记录，等待正式进入弯道
+    count_4 = 0;
+    count_315 = 0;
+    flag_zuo_da = 0;
+    flag_you_da = 0;
+    flag_zuo_xiao = 0;
+    flag_you_xiao = 0;
+
+    for (int i=leftpoint.size();i>=leftpoint.size();i--){ //左拐,检测是否有开口
+        if (leftpoint[i] == 4){
+            count_4 += 1;
+        }
+        else{
+            count_4 = 0;
+        }
+    }
+    for (int i=rightpoint.size();i>=rightpoint.size();i--){ //右拐
+        if (rightpoint[i] == 315){
+            count_315 += 1;
+        }
+        else{
+            count_315 = 0;
+        }
+    }
+  
+    int q_you = qulv(rightpoint);
+
+    int q_zuo = qulv(leftpoint);
+    
+    if (count_315 < 10 && count_4 > 30 && q_you>count_wan_value){ //左大拐弯
+        flag_zuo_da = 1;
+        flag_you_da = 0;
+        flag_zuo_xiao = 0;
+        flag_you_xiao = 0;
+    }
+    if (count_315 > 30 && count_4 < 10 && q_zuo>count_wan_value){
+        flag_zuo_da = 0;
+        flag_you_da = 1;
+        flag_zuo_xiao = 0;
+        flag_you_xiao = 0;
+    }
+    if (count_315 < 10 && count_4 > 30 && q_you<count_wan_value){
+        flag_zuo_da = 0;
+        flag_you_da = 0;
+        flag_zuo_xiao = 1;
+        flag_you_xiao = 0;
+    }
+    if (count_315 > 30 && count_4 < 10 && q_zuo>count_wan_value){
+        flag_zuo_da = 0;
+        flag_you_da = 0;
+        flag_zuo_xiao = 0;
+        flag_you_xiao = 1;
+    }
+}
+
+int Findline::zuodaguai(){ //如果预先设定的标志是1，以及右边缘比左边缘多很多，并且右边缘曲率大，那么认为进入大拐弯状态
+    if (flag_zuo_da == 1 && pointsEdgeRight.size() > 100*pointsEdgeLeft.size() && Findline::qulv(rightpoint) > count_wan_value){
+        flag = 1;
+        return 1;
+    }
+    else
+    {
+        if (flag == 1){
+            flag = 0;
+            flag_zuo_da = 0;
+            flag_you_da = 0;
+            flag_zuo_xiao = 0;
+            flag_you_xiao = 0;
+
+        }
+        return 0;
+    }
+}
+int Findline::youdaguai(){ //如果预先设定的标志是1，以及右边缘比左边缘多很多，并且右边缘曲率大，那么认为进入大拐弯状态
+    if (flag_you_da == 1 && pointsEdgeLeft.size() > 100*pointsEdgeRight.size() && Findline::qulv(leftpoint) > count_wan_value){
+        flag = 1;
+        return 1;
+    }
+    else
+    {
+        if (flag == 1){
+            flag = 0;
+            flag_zuo_da = 0;
+            flag_you_da = 0;
+            flag_zuo_xiao = 0;
+            flag_you_xiao = 0;
+
+        }
+        return 0;
+    }
+}
+
+int Findline::zuoxiaoguai(){ //如果预先设定的标志是1，以及右边缘比左边缘多很多，并且右边缘曲率大，那么认为进入大拐弯状态
+    if (flag_zuo_xiao == 1 && pointsEdgeRight.size() > 100*pointsEdgeLeft.size() && Findline::qulv(rightpoint) > count_wan_value){
+        flag = 1;
+        return 1;
+    }
+    else
+    {
+        if (flag == 1){
+            flag = 0;
+            flag_zuo_da = 0;
+            flag_you_da = 0;
+            flag_zuo_xiao = 0;
+            flag_you_xiao = 0;
+
+        }
+        return 0;
+    }
+}
+
+int Findline::youxiaoguai(){ //如果预先设定的标志是1，以及右边缘比左边缘多很多，并且右边缘曲率大，那么认为进入大拐弯状态
+    if (flag_you_xiao == 1 && pointsEdgeLeft.size() > 100*pointsEdgeRight.size() && Findline::qulv(leftpoint) > count_wan_value){
+        flag = 1;
+        return 1;
+    }
+    else
+    {
+        if (flag == 1){
+            flag = 0;
+            flag_zuo_da = 0;
+            flag_you_da = 0;
+            flag_zuo_xiao = 0;
+            flag_you_xiao = 0;
+
+        }
+        return 0;
+    }
+}
 

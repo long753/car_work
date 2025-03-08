@@ -119,8 +119,6 @@ public:
     void midline_calculate();
     void edge_calculate();
     // void distinguish_road_type();
-
-
     int zuo_dan_diao_width();
     int you_dan_diao_width();
     auto get_findline_draw_task(){
@@ -140,6 +138,27 @@ public:
       
     }
 
+
+
+    //测试
+    void searchLine(Mat & imgb);
+    int qulv(std::array<int,240> points);
+    void Pre_wan();
+    int zuodaguai();
+    int youdaguai();
+    int zuoxiaoguai();
+    int youxiaoguai();
+    std::array<int,240> leftpoint;
+    std::array<int,240> rightpoint;
+    int flag = 0;//正式进入,标记为1.主函数里面在flag＝1的时候，相当于进入弯道，一旦识别到不是弯道的部分，立刻将之前四个标志改为0,如果还没有进入弯道，即使识别到不是弯道也不要改成0.进入之前的预识别操作的要求是四个标志全为0
+    int count_4 = 0;
+    int count_315 = 0;
+    int flag_zuo_da = 0;//记录目前检测到的下一个弯是大弯还是小弯
+    int flag_you_da = 0;
+    int flag_zuo_xiao = 0;
+    int flag_you_xiao = 0;
+    float value = 0.7;//相对较大的曲率
+    int count_wan_value = 50;//相对较多的弯曲
 
 
 
