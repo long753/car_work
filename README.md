@@ -151,17 +151,20 @@ debug_image1_mutex 和 debug_image2_mutex：保护图像数据的互斥锁。
 
 首先，观察小车的上位机，主控，驱动板的开关是否处于关闭状态（分别位于小车的左右两边）。其次，把电源插上，注意观察电池的电压，要在11.1v到12.6v之间，不要过充过放。最后，打开那三个开关，等待edgeboard上的指示灯显示为绿色，小车成功启动。  
 
+
 ### 2.连接电脑
 
-#### 2.1 有线连接
+#### 2.1.1 有线连接（不知道ip地址，我们是知道的）
 
 1.用网线连接路由器和智能小车，同时电脑也连接这个路由器，进入路由器的管理界面，找到智能小车的IP地址。
 
 2.在电脑上打开终端，输入指令：
 ```
- ssh root@192.168.1.101    ( 或者： ssh root@paddlepi)
+ssh root@192.168.1.101    ( 或者： ssh root@paddlepi)
+```
 
 我们的机子：
+```
 ssh edgeboard@baidu7zu
 ```
 
@@ -169,52 +172,94 @@ ssh edgeboard@baidu7zu
 
 4.打开vscode，安装插件Remote-SSH，打开“远程资源管理器”，在vscode最上面输入：
 ```
- ssh root@paddlepi
- 
+ssh root@paddlepi
+```
+
 我们的机子：
+```
 ssh edgeboard@baidu7zu
 ```
 
 5.输入edgeboard的密码：edgeboard，即可连接成功。
 注意：请先完成VNC图形化界面的安装与连接，再进行无线连接。
 
+#### 2.1.2 有线连接（知道ip地址，参考这部分）
+
+1. 用网线连接电脑和智能小车
+
+2. 打开终端，输入指令：（有可能连接不上，多试几次）
+
+```bash
+ssh edgeboard@baidu7zu
+```
+
+学长的机子：
+```bash
+ssh root@edgeboard
+```
+
+然后输入密码：edgeboard，即可连接成功。
+
 #### 2.2 无线连接
-第一次无线连接时：保证有线连接成功，在VNC图形化界面中，打开网络设置，直接连接你的热点即可。同时把你的电脑也连在你的热点下面。如果不是第一次连接，只需打开手机热点
+第一次无线连接时：保证有线连接成功，在VNC图形化界面中，打开网络设置，直接连接你的热点即可，同时把你的电脑也连在你的热点下面。如果不是第一次连接，只需打开手机热点即可。
 
-打开vscode，打开“远程资源管理器”，点击paddlepi，进行远程连接。
+打开终端，输入指令：（有可能连接不上，多试几次）
+```bash
+ssh edgeboard@baidu7zu
+```
+密码：edgeboard
 
-输入edgeboard的密码：edgeboard，即可连接成功。
+### 3.连接vscode
+#### 3.1安装插件
 
-### 3.打开VNC图形化界面
+首先在vscode里面安装`Remote - SSH`，这一步很ez
+
+#### 3.2.1在插件里面点进work2(第一次连接）
+1. 点击ssh-remote的“+”号
+2. 在输入栏中输入：
+```
+ssh edgeboard@baidu7zu
+密码：edgeboard
+```
+3. 一直允许
+4. 在vscode里面打开work2文件夹
+```
+/home/edgeboard/work2
+```
+
+#### 3.2.2在插件里面点进work2
+密码：edgeboard
+
+
+### 4.打开VNC图形化界面
 
 如果你还没有安装VNC，请打开网址`https://www.realvnc.com/en/connect/download/viewer/`，安装windows版本的VNC客户端，并按照安装提示安装好。
 
-进入系统后，输入指令：
+进入edgeboard终端后，输入指令：
 ```
- vncserver :1 --localhost no
+vncserver :1 -localhost no
 ```
 
 其中，“:1”表示图形化界面端口号，可以自行设置。优先使用1号端口，当端口被占用时，可以尝试其他端口。
 
-然后打开VNC,建立新的连接：
+然后打开VNC,建立新的连接：（如果连接过，直接点你原来建立的就ok）
 ```
-vncserver：paddlepi:5901
-name: root
-
 我们的机子：
 vncserver：baidu7zu:5901
 name: edgeboard
 ```
+
+同时，如果使用的不是1端口，例如是2端口，对应的应该为：`vncserver：baidu7zu:5902`
 进入后输入密码：`edgeboard`  我们的机子是：`baidu7zu`
+
 
 ### 4.编译文件
 
 在VNC界面中，打开终端，切换到工程目录，输入指令：
 
 ```bash
- cd /home/edgeboard/3group/build
+ cd /home/edgeboard/work2/build
 ```
-
 保存好修改的代码后，输入指令：
   
 ```bash
@@ -223,12 +268,12 @@ name: edgeboard
 
 其中，“icar”表示编译的目标文件，“-j3”表示使用三个线程编译，可以加快编译时间。这里的编译时间会根据你的修改程度而变化。
 
+
 ### 5.运行程序
 
 在终端中，切换到工程目录，输入指令：
 
 ```bash
- cd /home/edgeboard/3group/build
  ./icar
 ```
 
