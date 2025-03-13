@@ -33,10 +33,10 @@ public:
                     // 用于环补线的点（列号）
 
 
-  std::array<int,30> ring_state_right; //保存找到右环的状态
-  std::array<int,30> ring_state_near_right; //保存找到右环的状态
-  std::array<int, 30> ring_state_left;
-  std::array<int, 30> ring_state_near_left;
+  int ring_state_right = 0; //保存找到右环的次数
+  int ring_state_near_right = 0; //保存找到右环的状态
+  int ring_state_left = 0; //保存找到左环的次数
+  int ring_state_near_left = 0;//保存找到左环的状态
 
   int corner_up_index= 0;
   int corner_up_update_count = 0; //上拐点更新计数

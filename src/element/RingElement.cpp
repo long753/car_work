@@ -14,10 +14,7 @@ void Ring::reset() {
     ringType = RingType::RingNone;
     ringStep = RingStep::None;
     repairline_straight = 30;
-
-    ring_state_right.fill(0);
     ring_state_near_right.fill(0);
-    ring_state_left.fill(0);
     ring_state_near_left.fill(0);
 
     corner_up_index = 0;
@@ -113,11 +110,13 @@ void Ring::circle_search(Findline &findline, float angle) {
                 get_up_corner(findline);
                 repair_line_enter(findline);
             }
+            
             std::cout<<"Entering"<<std::endl;
+            std::cout<<"flag_far"<<flag_far<<std::endl;
 
             // 判断是否更新
             if (flag_far == 0 && Entering_flag == 1) {
-                ringStep = RingStep::Inside;  
+                // ringStep = RingStep::Inside;  
                 inside_flag = 1;          
             }
         }
@@ -192,98 +191,42 @@ void Ring::circle_search(Findline &findline, float angle) {
 
 // 检查远处右转拐点
 int Ring::check_far_corner_right(Findline &findline) {
-    if(check_corner(findline.dir_r, findline.right_point, corner_up_index, 6, 4)){
-        corner_up_update_count++;
-    }
-    if (corner_up_update_count == 3){
-        corner_up_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner( findline.dir_r, findline.right_point, corner_up_index, 6, 4);
 }
 
 // 检查近处右转拐点
 int Ring::check_near_corner_right(Findline &findline) {
-    if(check_corner(findline.dir_r, findline.right_point, corner_down_index, 4, 2)){
-        corner_down_update_count++;
-    }
-    if (corner_down_update_count == 3){
-        corner_down_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner( findline.dir_r, findline.right_point, corner_down_index, 4, 2);
 }
 
 // 检查右侧中拐点
 int Ring::check_mid_corner_right(Findline &findline) {
-    if(check_corner(findline.dir_r, findline.right_point, corner_mid_index, 5, 3)){
-        corner_mid_update_count++;
-    }
-    if (corner_mid_update_count == 3){
-        corner_mid_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner( findline.dir_r, findline.right_point, corner_mid_index, 5, 3);
 }
 
 // 检查右环出口拐点
 int Ring::check_exit_corner_right(Findline &findline) {
-    if(check_corner(findline.dir_l, findline.left_point, corner_exit_index, 4, 6)){
-        corner_exit_update_count++;
-    }
-    if (corner_exit_update_count == 3){
-        corner_exit_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner( findline.dir_l, findline.left_point, corner_exit_index, 6, 4);
 }
 
 // 检查远处左转拐点
 int Ring::check_far_corner_left(Findline &findline) {
-    if(check_corner(findline.dir_l, findline.left_point, corner_up_index, 6, 4)){
-        corner_up_update_count++;
-    }
-    if (corner_up_update_count == 3){
-        corner_up_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner(findline.dir_l, findline.left_point, corner_up_index, 4, 2);
 }
 
 // 检查近处左转拐点
 int Ring::check_near_corner_left(Findline &findline) {
-    if(check_corner(findline.dir_l, findline.left_point, corner_down_index, 4, 2)){
-        corner_down_update_count++;
-    }
-    if (corner_down_update_count == 3){
-        corner_down_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner(findline.dir_l, findline.left_point, corner_down_index, 4, 2);
 }
 
 // 检查左侧中拐点
 int Ring::check_mid_corner_left(Findline &findline) {
-    if(check_corner(findline.dir_l, findline.left_point, corner_mid_index, 5, 3)){
-        corner_mid_update_count++;
-    }
-    if (corner_mid_update_count == 3){
-        corner_mid_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner( findline.dir_l, findline.left_point, corner_mid_index, 5, 3);
 }
 
 // 检查左环出口拐点
 int Ring::check_exit_corner_left(Findline &findline) {
-    if(check_corner(findline.dir_r, findline.right_point, corner_exit_index, 4, 6)){
-        corner_exit_update_count++;
-    }
-    if (corner_exit_update_count == 3){
-        corner_exit_update_count = 0;
-        return 1;
-    }
-    return 0;
+    return check_corner( findline.dir_r, findline.right_point, corner_exit_index, 6, 4);
 }
 
 // 获取上拐点
@@ -317,14 +260,12 @@ int Ring::get_mid_corner(Findline &findline) {
         if(corner_mid_index == 0 || corner_mid_index >= findline.right_point.size()) {
             return 0;
         }
-
         corner_mid_point = findline.right_point[corner_mid_index];
         return 1;
     } else if(ringType == RingType::RingLeft) {
         if(corner_mid_index == 0 || corner_mid_index >= findline.left_point.size()) {
             return 0;
         }
-
         corner_mid_point = findline.left_point[corner_mid_index];
         return 1;
     }
@@ -364,21 +305,64 @@ int Ring::get_exit_corner(Findline &findline) {
 
 
 // 检测圆环,判断入环方向
+//当连续检测到三次右环时，判断为右环，防止误判十字
 int Ring::image_to_enter(Findline &findline) {
     if(ringStep == RingStep::None) {
-        if(straight_line_judge(findline.dir_l, findline.left_point) ^ straight_line_judge(findline.dir_r, findline.right_point)) {
-            ringStep = RingStep::PreEntering;
-            if(straight_line_judge(findline.dir_l, findline.left_point)) {
-                ringType = RingType::RingRight;
-            } else {
-                ringType = RingType::RingLeft;
+
+        //增强鲁棒性方案
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //疑似圆环
+        if(straight_line_judge(findline.dir_l, findline.left_point) ^ straight_line_judge(findline.dir_r, findline.right_point)) {  //左右两边类型不同
+            if(straight_line_judge(findline.dir_l, findline.left_point) && ring_state_right == 0) {
+                ring_state_near_right = ring_state_near_right + 1;
+                if(ring_state_near_right > 3) {
+                    ringType = RingType::RingRight;
+                    ringStep = RingStep::PreEntering;
+                    // ring_state_near_right  = 1;  //根据场上的圆环数量来判断
+                    return 1;
+                }
+            } 
+            else if(straight_line_judge(findline.dir_r, findline.right_point) && ring_state_left == 0) {
+                ring_state_near_left = ring_state_near_left + 1;
+                if(ring_state_near_left > 3) {
+                    ringType = RingType::RingLeft;
+                    ringStep = RingStep::PreEntering;
+                    // ring_state_near_left = 1;  //根据场上的圆环数量来判断
+                    return 1;
+                }
             }
-            return 1;
         }
+        //不是圆环
+        else {
+            ring_state_near_right = 0;
+            ring_state_near_left = 0;
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //原方案
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // if(straight_line_judge(findline.dir_l, findline.left_point) ^ straight_line_judge(findline.dir_r, findline.right_point)) {  //左右两边类型不同
+        //     if(straight_line_judge(findline.dir_l, findline.left_point) && ring_state_right == 0) {
+        //             ringType = RingType::RingRight;
+        //             ringStep = RingStep::PreEntering;
+        //             // ring_state_near_right  = 1;  //根据场上的圆环数量来判断
+        //             return 1;
+        //     } 
+        //     else if(straight_line_judge(findline.dir_r, findline.right_point) && ring_state_left == 0) {
+        //             ringType = RingType::RingLeft;
+        //             ringStep = RingStep::PreEntering;
+        //             // ring_state_near_left = 1;  //根据场上的圆环数量来判断
+        //             return 1;
+        //     }
+        // }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     }
-    else{
-        return 1;
-    }
+
+    //std::cout<<"test left:"<<std:endl;
+    // straight_line_judge(findline.dir_l, findline.left_point);
+    //std::cout<<"test right:"<<std:endl;
+    // straight_line_judge(findline.dir_r, findline.right_point);
     return 0;
 }
 
@@ -534,6 +518,10 @@ bool Ring::straight_line_judge(std::vector<int> dir, std::vector<cv::Point> poin
     int guai_count = 0;
     int current_corner = 0;
     int range_count = 5;
+	int flag1 = 0;
+	int flag2 = 0;
+	int corner1_index = 0;
+	int corner2_index = 0;
 
     for(size_t i = 0; i < dir.size(); i++) {
         if(dir[i] == 4 || dir[i] == 5) {
@@ -596,13 +584,32 @@ bool Ring::straight_line_judge(std::vector<int> dir, std::vector<cv::Point> poin
             // if(line_type_and_count[i].first == 4 && line_type_and_count[i + 1].first == 2
             //     && line_type_and_count[i].second >= 10 && line_type_and_count[i + 1].second >= 10
             //     && angle <= 120) {
+			// 		flag1 =1;
+			// 		corner1_index = suspect_corner[i];
+			// 		std::cout<<"corner1_index corner1_index corner1_index corner1_index:"<<corner1_index<<std::endl;
+			// 	}
+
+			// if(line_type_and_count[i].first == 6 && line_type_and_count[i + 1].first == 4
+			// && line_type_and_count[i].second >= 10 && line_type_and_count[i + 1].second >= 10
+			// && angle <= 120) {
+			// 	flag2 =1;
+			// 	corner2_index = suspect_corner[i];
+			// 	std::cout<<"corner2_index corner2_index corner2_index corner2_index:"<<corner2_index<<std::endl;
+			// }
+
+			// if(flag1 == 1 && flag2 == 1 ){
+			// 	return true;
+			// }
+
+			// return false;
+
             if(line_type_and_count[i].second >= 10 && line_type_and_count[i + 1].second >= 10
-                && angle <= 120) {            
+                && 20 <= angle <= 120) { 
                 if(current_corner == 0) {
                     current_corner = suspect_corner[i];
                     guai_count++;
                 } else {
-                    if(suspect_corner[i] - current_corner > 20) {
+                    if(suspect_corner[i] - current_corner > 30) {
                         current_corner = suspect_corner[i]; 
                         guai_count++;
                     }
@@ -611,7 +618,7 @@ bool Ring::straight_line_judge(std::vector<int> dir, std::vector<cv::Point> poin
         }
     }
 
-    return guai_count < 2;
+    return guai_count < 4;
 }
 
 // 检查拐点的公共函数
