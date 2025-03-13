@@ -14,8 +14,8 @@ void Ring::reset() {
     ringType = RingType::RingNone;
     ringStep = RingStep::None;
     repairline_straight = 30;
-    ring_state_near_right.fill(0);
-    ring_state_near_left.fill(0);
+    ring_state_near_right = 0;
+    ring_state_near_left = 0;
 
     corner_up_index = 0;
     corner_up_update_count = 0;
