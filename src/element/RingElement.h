@@ -77,7 +77,7 @@ public:
 
 
   //需要写的函数
-  Ring();  
+  Ring(); 
   void reset();
   void circle_search(Findline & findline,float angle);
   int check_far_corner_right(Findline &findline);
@@ -105,6 +105,9 @@ public:
   int flag_far = 0;
   int flag_mid = 0;
   int flag_near = 0;
+  int flag_exit = 0;
+  int guaiCount_left = 0;
+  int guaiCount_right = 0;
 
   auto get_draw_task(){
     return [*this](cv::Mat img){

@@ -794,7 +794,7 @@ for(int i=dir_r.size()*9/10;i<dir_r.size()*9/10+5 && i<dir_r.size();i++){
 //     }
 // }
 
-// std::cout<<mode<<endl;
+// std::cout<<mod？e<<endl;
 // Findline draw;
 // draw.drawImage(img_used,left_copy,right_copy);//画一下变换后的边线
 // }
